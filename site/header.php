@@ -79,6 +79,16 @@ $flashPublic = function_exists('flash_get') ? flash_get('flash_public') : null;
             color: #475569;
             margin: 0 0 1.1rem;
         }
+        .hero-slider-track { will-change: transform; touch-action: pan-y; }
+        .hero-slider.is-dragging { cursor: grabbing; }
+        .hero-slider-dot {
+            width: 0.55rem;
+            height: 0.55rem;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.45);
+            transition: width 0.2s ease, background 0.2s ease;
+        }
+        .hero-slider-dot.is-active { width: 1.35rem; background: #22d3ee; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 antialiased">

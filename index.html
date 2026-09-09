@@ -11,6 +11,18 @@
     <script>
         tailwind.config = { theme: { extend: { colors: { ink: '#071018' } } } }
     </script>
+    <style>
+        .hero-slider-track { will-change: transform; touch-action: pan-y; }
+        .hero-slider.is-dragging { cursor: grabbing; }
+        .hero-slider-dot {
+            width: 0.55rem;
+            height: 0.55rem;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.45);
+            transition: width 0.2s ease, background 0.2s ease;
+        }
+        .hero-slider-dot.is-active { width: 1.35rem; background: #22d3ee; }
+    </style>
 </head>
 <body class="bg-slate-50 text-slate-800 antialiased">
 <header class="bg-ink text-white">
@@ -28,6 +40,47 @@
     </div>
 </header>
 <main class="max-w-6xl mx-auto px-4 py-10">
+    <section class="hero-slider relative mb-8 overflow-hidden rounded-2xl bg-ink text-white select-none"
+             data-hero-slider data-autoplay="1" data-interval="5000"
+             aria-roledescription="carousel" aria-label="Öne çıkan slaytlar">
+        <div class="overflow-hidden">
+            <div class="hero-slider-track flex" data-hero-track>
+                <article class="hero-slider-slide relative min-w-full h-64 sm:h-80 lg:h-[26rem]" data-hero-slide>
+                    <div class="absolute inset-0 bg-gradient-to-br from-slate-950 via-slate-900 to-cyan-900"></div>
+                    <div class="absolute inset-0 bg-gradient-to-r from-black/75 via-black/40 to-black/10"></div>
+                    <div class="relative z-10 flex h-full flex-col justify-end p-6 sm:p-10 max-w-2xl pointer-events-none">
+                        <h2 class="text-2xl sm:text-4xl font-bold tracking-tight">Kodcu’ya hoş geldiniz</h2>
+                        <p class="mt-2 sm:mt-3 text-sm sm:text-lg text-slate-200 max-w-xl">Yazılım notları, rehberler ve geliştirici günlüğü.</p>
+                        <a href="./" class="pointer-events-auto mt-4 inline-flex w-fit items-center rounded-md bg-cyan-400 px-4 py-2 text-sm font-semibold text-ink hover:bg-cyan-300">Yazıları oku</a>
+                    </div>
+                </article>
+                <article class="hero-slider-slide relative min-w-full h-64 sm:h-80 lg:h-[26rem]" data-hero-slide>
+                    <div class="absolute inset-0 bg-gradient-to-br from-ink via-slate-900 to-sky-900"></div>
+                    <div class="absolute inset-0 bg-gradient-to-r from-black/75 via-black/40 to-black/10"></div>
+                    <div class="relative z-10 flex h-full flex-col justify-end p-6 sm:p-10 max-w-2xl pointer-events-none">
+                        <h2 class="text-2xl sm:text-4xl font-bold tracking-tight">Görselleri sürükleyip bırakın</h2>
+                        <p class="mt-2 sm:mt-3 text-sm sm:text-lg text-slate-200 max-w-xl">Slider slaytlarını panelden sıralayın, yükleyin ve anında yayına alın.</p>
+                        <a href="index.php?page=slider" class="pointer-events-auto mt-4 inline-flex w-fit items-center rounded-md bg-cyan-400 px-4 py-2 text-sm font-semibold text-ink hover:bg-cyan-300">Yönetim paneli</a>
+                    </div>
+                </article>
+                <article class="hero-slider-slide relative min-w-full h-64 sm:h-80 lg:h-[26rem]" data-hero-slide>
+                    <div class="absolute inset-0 bg-gradient-to-br from-slate-950 via-cyan-950 to-slate-800"></div>
+                    <div class="absolute inset-0 bg-gradient-to-r from-black/75 via-black/40 to-black/10"></div>
+                    <div class="relative z-10 flex h-full flex-col justify-end p-6 sm:p-10 max-w-2xl pointer-events-none">
+                        <h2 class="text-2xl sm:text-4xl font-bold tracking-tight">Yazılar, sayfalar ve projeler</h2>
+                        <p class="mt-2 sm:mt-3 text-sm sm:text-lg text-slate-200 max-w-xl">Kategoriler, medya kütüphanesi ve yorumlarla büyüyen bir geliştirici sitesi.</p>
+                    </div>
+                </article>
+            </div>
+        </div>
+        <button type="button" data-hero-prev class="absolute left-3 top-1/2 z-20 -translate-y-1/2 rounded-full bg-black/40 p-2 text-white hover:bg-black/60" aria-label="Önceki slayt">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" /></svg>
+        </button>
+        <button type="button" data-hero-next class="absolute right-3 top-1/2 z-20 -translate-y-1/2 rounded-full bg-black/40 p-2 text-white hover:bg-black/60" aria-label="Sonraki slayt">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" /></svg>
+        </button>
+        <div class="absolute bottom-3 left-0 right-0 z-20 flex justify-center gap-2" data-hero-dots></div>
+    </section>
     <section class="mb-8">
         <p class="text-sm uppercase tracking-wide text-cyan-700 font-semibold">Geliştirici günlüğü</p>
         <h1 class="mt-2 text-4xl font-bold text-slate-900">Kodcu</h1>
@@ -36,6 +89,7 @@
     <div class="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900 mb-8">
         Bu GitHub Pages kopyası yalnızca önizlemedir. PHP ve MySQL çalışmaz; canlı site için PHP hosting gerekir
         (<a class="underline" href="https://kodcu.site/" target="_blank" rel="noopener">kodcu.site</a>).
+        Slider’ı sürükleyerek veya ok tuşlarıyla deneyin.
     </div>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <article class="bg-white border border-slate-200 rounded-xl p-5">
@@ -61,5 +115,114 @@
         <a class="hover:text-slate-800" href="https://github.com/Remedolt/webpanel">Kaynak kod</a>
     </div>
 </footer>
+<script>
+(function () {
+    function initSlider(root) {
+        var track = root.querySelector('[data-hero-track]');
+        var slides = root.querySelectorAll('[data-hero-slide]');
+        var prev = root.querySelector('[data-hero-prev]');
+        var next = root.querySelector('[data-hero-next]');
+        var dotsWrap = root.querySelector('[data-hero-dots]');
+        var count = slides.length;
+        if (!track || count < 1) return;
+        var index = 0;
+        var autoplay = root.getAttribute('data-autoplay') === '1' && count > 1;
+        var interval = parseInt(root.getAttribute('data-interval') || '5000', 10);
+        if (isNaN(interval) || interval < 2000) interval = 5000;
+        var timer = null;
+        var drag = { active: false, startX: 0, startY: 0, dx: 0, locked: null, pointerId: null };
+        function dots() {
+            if (!dotsWrap) return;
+            dotsWrap.innerHTML = '';
+            if (count < 2) return;
+            for (var i = 0; i < count; i++) {
+                var btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'hero-slider-dot' + (i === index ? ' is-active' : '');
+                btn.setAttribute('aria-label', 'Slayt ' + (i + 1));
+                btn.setAttribute('data-hero-to', String(i));
+                dotsWrap.appendChild(btn);
+            }
+        }
+        function go(to, animate) {
+            if (count < 1) return;
+            index = (to + count) % count;
+            track.style.transition = animate === false ? 'none' : 'transform 0.45s ease';
+            track.style.transform = 'translate3d(' + (-index * 100) + '%,0,0)';
+            root.querySelectorAll('[data-hero-dots] .hero-slider-dot').forEach(function (dot, i) {
+                if (i === index) dot.classList.add('is-active');
+                else dot.classList.remove('is-active');
+            });
+            if (animate === false) {
+                track.offsetHeight;
+                track.style.transition = 'transform 0.45s ease';
+            }
+        }
+        function stop() { if (timer) { clearInterval(timer); timer = null; } }
+        function start() {
+            stop();
+            if (!autoplay || count < 2) return;
+            timer = setInterval(function () { go(index + 1); }, interval);
+        }
+        if (prev) prev.addEventListener('click', function () { go(index - 1); start(); });
+        if (next) next.addEventListener('click', function () { go(index + 1); start(); });
+        if (dotsWrap) {
+            dotsWrap.addEventListener('click', function (ev) {
+                var btn = ev.target.closest('[data-hero-to]');
+                if (!btn) return;
+                go(parseInt(btn.getAttribute('data-hero-to') || '0', 10));
+                start();
+            });
+        }
+        root.addEventListener('mouseenter', stop);
+        root.addEventListener('mouseleave', start);
+        root.addEventListener('keydown', function (ev) {
+            if (ev.key === 'ArrowLeft') { go(index - 1); start(); }
+            else if (ev.key === 'ArrowRight') { go(index + 1); start(); }
+        });
+        root.setAttribute('tabindex', '0');
+        function onPointerDown(ev) {
+            if (count < 2) return;
+            if (ev.target.closest('a, button')) return;
+            drag.active = true;
+            drag.startX = ev.clientX; drag.startY = ev.clientY; drag.dx = 0; drag.locked = null; drag.pointerId = ev.pointerId;
+            root.classList.add('is-dragging');
+            track.style.transition = 'none';
+            try { root.setPointerCapture(ev.pointerId); } catch (err) {}
+            stop();
+        }
+        function onPointerMove(ev) {
+            if (!drag.active) return;
+            var dx = ev.clientX - drag.startX;
+            var dy = ev.clientY - drag.startY;
+            if (drag.locked === null && (Math.abs(dx) > 8 || Math.abs(dy) > 8)) {
+                drag.locked = Math.abs(dx) >= Math.abs(dy) ? 'x' : 'y';
+            }
+            if (drag.locked === 'y') return;
+            drag.dx = dx;
+            var width = root.offsetWidth || 1;
+            track.style.transform = 'translate3d(' + ((-index * 100) + (dx / width) * 100) + '%,0,0)';
+            ev.preventDefault();
+        }
+        function onPointerUp(ev) {
+            if (!drag.active) return;
+            drag.active = false;
+            root.classList.remove('is-dragging');
+            try { root.releasePointerCapture(ev.pointerId); } catch (err) {}
+            var width = root.offsetWidth || 1;
+            var threshold = Math.min(120, width * 0.18);
+            if (drag.locked === 'x' && Math.abs(drag.dx) > threshold) go(drag.dx < 0 ? index + 1 : index - 1);
+            else go(index);
+            start();
+        }
+        root.addEventListener('pointerdown', onPointerDown);
+        root.addEventListener('pointermove', onPointerMove);
+        root.addEventListener('pointerup', onPointerUp);
+        root.addEventListener('pointercancel', onPointerUp);
+        dots(); go(0, false); start();
+    }
+    document.querySelectorAll('[data-hero-slider]').forEach(initSlider);
+})();
+</script>
 </body>
 </html>

@@ -55,15 +55,20 @@ for ($i = 6; $i >= 0; $i--) {
         <h1 class="text-2xl font-semibold text-slate-900">Başlangıç</h1>
         <p class="mt-1 text-sm text-slate-500">Yazılar ve sayfalar yayımlanınca ziyaretçi sitesinde görünür.</p>
     </div>
-    <a href="<?= e(public_url()) ?>" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center rounded-md bg-[#2271b1] px-4 py-2 text-sm font-semibold text-white hover:bg-blue-800">
-        Siteyi aç
-    </a>
+    <div class="flex flex-wrap gap-2">
+        <a href="index.php?page=slider" class="inline-flex items-center justify-center rounded-md border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">
+            Slider
+        </a>
+        <a href="<?= e(public_url()) ?>" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center rounded-md bg-[#2271b1] px-4 py-2 text-sm font-semibold text-white hover:bg-blue-800">
+            Siteyi aç
+        </a>
+    </div>
 </div>
 
 <div class="mb-6 bg-white rounded-lg shadow-sm border border-slate-200 p-4 text-sm text-slate-600">
     <p><span class="font-semibold text-slate-900">Ziyaretçi sitesi:</span> <a class="text-[#2271b1] hover:underline" href="<?= e(public_url()) ?>" target="_blank" rel="noopener noreferrer"><?= e(public_url()) ?></a></p>
     <p class="mt-1"><span class="font-semibold text-slate-900">Yönetim paneli:</span> <?= e(rtrim(PANEL_URL, '/') . '/') ?></p>
-    <p class="mt-2 text-slate-500">Yazılar → Yeni Ekle → Yayımla. Sayfalar menüsünden eklenen ve yayımlanan sayfalar sitenin üst menüsünde çıkar. Yorumlar onaylanınca yazının altında görünür.</p>
+    <p class="mt-2 text-slate-500">Yazılar → Yeni Ekle → Yayımla. Slider menüsünden ana sayfa slaytlarını sürükleyip sıralayın. Sayfalar menüsünden eklenen ve yayımlanan sayfalar sitenin üst menüsünde çıkar. Yorumlar onaylanınca yazının altında görünür.</p>
 </div>
 
 <?php if ($pendingCommentsDash > 0 || $unreadMessagesDash > 0): ?>

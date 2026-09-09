@@ -49,6 +49,7 @@ $perPageVal = option_get($pdo, 'posts_per_page', '10');
             <input id="site_url" name="site_url" value="<?= e($siteUrlVal) ?>" class="w-full rounded-md border border-slate-200 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200">
             <p class="mt-1 text-xs text-slate-400">“Siteyi görüntüle” bağlantısı bu adresi açar.</p>
         </div>
+        <p class="rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-500">Ana sayfa slider’ını <a class="text-[#2271b1] hover:underline" href="index.php?page=slider">Slider</a> sayfasından sürükleyerek yönetin.</p>
         <div>
             <label class="mb-1 block text-sm font-medium text-slate-700" for="posts_per_page">Sayfa başına yazı</label>
             <input id="posts_per_page" name="posts_per_page" type="number" min="5" max="50" value="<?= e($perPageVal) ?>" class="w-32 rounded-md border border-slate-200 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200">
