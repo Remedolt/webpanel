@@ -1,0 +1,8 @@
+webpanel/includes/config.php
+webpanel/error_log
+error_log
+*.log
+.DS_Store
+Thumbs.db
+webpanel/uploads/*
+!webpanel/uploads/.htaccess

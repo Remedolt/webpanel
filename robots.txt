@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /webpanel/
+
+Sitemap: https://kodcu.site/sitemap.php

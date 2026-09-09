@@ -1,0 +1,26 @@
+DirectoryIndex index.php
+Options -Indexes
+
+<IfModule mod_authz_core.c>
+    <FilesMatch "(?i)^(schema\.sql)$">
+        Require all denied
+    </FilesMatch>
+</IfModule>
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    RewriteRule ^yazi/([^/]+)/?$ yazi.php?slug=$1 [L,QSA]
+    RewriteRule ^sayfa/([^/]+)/?$ sayfa.php?slug=$1 [L,QSA]
+    RewriteRule ^kategori/([^/]+)/?$ kategori.php?slug=$1 [L,QSA]
+    RewriteRule ^ara/?$ ara.php [L,QSA]
+</IfModule>
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    RewriteRule ^yazi/([^/]+)/?$ yazi.php?slug=$1 [L,QSA]
+    RewriteRule ^sayfa/([^/]+)/?$ sayfa.php?slug=$1 [L,QSA]
+    RewriteRule ^kategori/([^/]+)/?$ kategori.php?slug=$1 [L,QSA]
+    RewriteRule ^ara/?$ ara.php [L,QSA]
+</IfModule>

@@ -1,0 +1,13 @@
+DirectoryIndex index.php install.php
+Options -Indexes
+
+<FilesMatch "(?i)^(schema\.sql|config\.php)$">
+    Require all denied
+</FilesMatch>
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^ index.php [L]
+</IfModule>
