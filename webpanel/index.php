@@ -39,6 +39,7 @@ $allowedPages = [
     'categories' => 'categories.php',
     'pages'      => 'pages.php',
     'media'      => 'media.php',
+    'slider'     => 'slider.php',
     'comments'   => 'comments.php',
     'messages'   => 'messages.php',
     'users'      => 'users.php',
@@ -173,6 +174,17 @@ if (strpos($pagePathNorm, $pagesDirNorm . '/') !== 0 && $pagePathNorm !== $pages
 }
 
 $currentPage = $pageKey;
+
+$wantsJson = $_SERVER['REQUEST_METHOD'] === 'POST'
+    && (
+        isset($_POST['ajax'])
+        || strtolower((string) ($_SERVER['HTTP_X_REQUESTED_WITH'] ?? '')) === 'xmlhttprequest'
+    );
+if ($wantsJson && $pageKey === 'slider') {
+    require $pagePath;
+    exit;
+}
+
 $pageTitles = [
     'dashboard'  => 'Başlangıç',
     'posts'      => 'Tüm Yazılar',
@@ -180,6 +192,7 @@ $pageTitles = [
     'categories' => 'Kategoriler',
     'pages'      => 'Sayfalar',
     'media'      => 'Medya Kütüphanesi',
+    'slider'     => 'Slider',
     'comments'   => 'Yorumlar',
     'messages'   => 'Mesajlar',
     'users'      => 'Kullanıcılar',

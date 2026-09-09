@@ -356,6 +356,28 @@ function cms_ensure_schema(PDO $pdo): void
             KEY idx_contact_read (is_read)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
     );
+    $pdo->exec(
+        "CREATE TABLE IF NOT EXISTS slides (
+            id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+            title VARCHAR(255) NOT NULL DEFAULT '',
+            subtitle TEXT NULL,
+            button_text VARCHAR(120) NULL,
+            link_url VARCHAR(500) NULL,
+            image VARCHAR(255) NULL,
+            sort_order INT UNSIGNED NOT NULL DEFAULT 0,
+            is_active TINYINT(1) NOT NULL DEFAULT 1,
+            created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (id),
+            KEY idx_slides_active_order (is_active, sort_order)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
+    );
+    try {
+        $pdo->exec("INSERT IGNORE INTO options (option_key, option_value) VALUES ('slider_autoplay', '1')");
+        $pdo->exec("INSERT IGNORE INTO options (option_key, option_value) VALUES ('slider_interval', '5000')");
+        $pdo->exec("INSERT IGNORE INTO options (option_key, option_value) VALUES ('slider_enabled', '1')");
+    } catch (Throwable $e) {
+        // ignore
+    }
 
     try {
         $iletisim = $pdo->query("SELECT id, content FROM site_pages WHERE slug = 'iletisim' LIMIT 1")->fetch();
@@ -368,6 +390,7 @@ function cms_ensure_schema(PDO $pdo): void
     } catch (Throwable $e) {
         // ignore
     }
+    cms_seed_slides($pdo);
 }
 
 function media_src($path)
@@ -524,7 +547,96 @@ function cms_seed(PDO $pdo): void
         $stmt->execute(['site_tagline', 'Yazılar, sayfalar ve projeler']);
         $stmt->execute(['posts_per_page', '10']);
         $stmt->execute(['site_url', PUBLIC_URL]);
+        $stmt->execute(['slider_autoplay', '1']);
+        $stmt->execute(['slider_interval', '5000']);
+        $stmt->execute(['slider_enabled', '1']);
     }
+
+    cms_seed_slides($pdo);
+}
+
+function cms_seed_slides(PDO $pdo): void
+{
+    try {
+        $slideCount = (int) $pdo->query('SELECT COUNT(*) FROM slides')->fetchColumn();
+    } catch (Throwable $e) {
+        return;
+    }
+    if ($slideCount > 0) {
+        return;
+    }
+    $ins = $pdo->prepare(
+        'INSERT INTO slides (title, subtitle, button_text, link_url, image, sort_order, is_active)
+         VALUES (?, ?, ?, ?, ?, ?, ?)'
+    );
+    $ins->execute([
+        'Kodcu’ya hoş geldiniz',
+        'Yazılım notları, rehberler ve geliştirici günlüğü.',
+        'Yazıları oku',
+        '/',
+        '',
+        0,
+        1,
+    ]);
+    $ins->execute([
+        'Görselleri sürükleyip bırakın',
+        'Slider slaytlarını panelden sıralayın, yükleyin ve anında yayına alın.',
+        'Hakkında',
+        public_url('sayfa/hakkinda'),
+        '',
+        1,
+        1,
+    ]);
+    $ins->execute([
+        'Yazılar, sayfalar ve projeler',
+        'Kategoriler, medya kütüphanesi ve yorumlarla büyüyen bir geliştirici sitesi.',
+        'Kategorilere bak',
+        public_url('kategori/rehber'),
+        '',
+        2,
+        1,
+    ]);
+}
+
+function sanitize_slide_url(string $url): string
+{
+    $url = trim($url);
+    if ($url === '') {
+        return '';
+    }
+    if (isset($url[0]) && $url[0] === '/') {
+        return $url;
+    }
+    if (stripos($url, 'http://') === 0 || stripos($url, 'https://') === 0) {
+        return $url;
+    }
+    return '';
+}
+
+function active_home_slides(PDO $pdo): array
+{
+    if (option_get($pdo, 'slider_enabled', '1') !== '1') {
+        return [];
+    }
+    try {
+        return $pdo->query(
+            'SELECT id, title, subtitle, button_text, link_url, image, sort_order
+             FROM slides
+             WHERE is_active = 1
+             ORDER BY sort_order ASC, id ASC'
+        )->fetchAll();
+    } catch (Throwable $e) {
+        return [];
+    }
+}
+
+function slider_public_link(string $url): string
+{
+    $url = sanitize_slide_url($url);
+    if ($url === '' || $url === '/') {
+        return public_url();
+    }
+    return $url;
 }
 
 function handle_image_upload(string $field = 'featured_image'): ?string
@@ -532,7 +644,11 @@ function handle_image_upload(string $field = 'featured_image'): ?string
     if (!isset($_FILES[$field]) || !is_array($_FILES[$field])) {
         return null;
     }
-    $file = $_FILES[$field];
+    return handle_uploaded_image_file($_FILES[$field]);
+}
+
+function handle_uploaded_image_file(array $file): ?string
+{
     $error = (int) ($file['error'] ?? UPLOAD_ERR_NO_FILE);
     if ($error === UPLOAD_ERR_NO_FILE) {
         return null;
@@ -570,4 +686,32 @@ function handle_image_upload(string $field = 'featured_image'): ?string
         return null;
     }
     return UPLOAD_URL . $name;
+}
+
+function handle_multiple_image_uploads(string $field): array
+{
+    if (!isset($_FILES[$field]) || !is_array($_FILES[$field])) {
+        return [];
+    }
+    $bag = $_FILES[$field];
+    if (!isset($bag['name']) || !is_array($bag['name'])) {
+        $path = handle_image_upload($field);
+        return $path ? [$path] : [];
+    }
+    $paths = [];
+    $count = count($bag['name']);
+    for ($i = 0; $i < $count; $i++) {
+        $one = [
+            'name'     => $bag['name'][$i] ?? '',
+            'type'     => $bag['type'][$i] ?? '',
+            'tmp_name' => $bag['tmp_name'][$i] ?? '',
+            'error'    => $bag['error'][$i] ?? UPLOAD_ERR_NO_FILE,
+            'size'     => $bag['size'][$i] ?? 0,
+        ];
+        $path = handle_uploaded_image_file($one);
+        if ($path) {
+            $paths[] = $path;
+        }
+    }
+    return $paths;
 }

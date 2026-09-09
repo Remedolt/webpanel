@@ -37,6 +37,9 @@ $metaDescription = $siteTagline !== '' ? $siteTagline : ($siteTitle . ' yazılı
 $canonicalUrl = $pageNum > 1 ? public_url('?p=' . $pageNum) : public_url();
 require __DIR__ . '/site/header.php';
 ?>
+<?php if ($pageNum === 1): ?>
+    <?php require __DIR__ . '/site/hero-slider.php'; ?>
+<?php endif; ?>
 <div class="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_18rem] gap-8 items-start">
     <div>
         <section class="mb-8">
