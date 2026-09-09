@@ -1,8 +1,28 @@
 <?php
 declare(strict_types=1);
 
+error_reporting(E_ALL);
+register_shutdown_function(static function () {
+    $err = error_get_last();
+    if (!is_array($err)) {
+        return;
+    }
+    $fatalTypes = array(E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR, E_USER_ERROR);
+    if (!in_array($err['type'], $fatalTypes, true)) {
+        return;
+    }
+    if (!headers_sent()) {
+        header('Content-Type: text/html; charset=UTF-8');
+    }
+    echo '<pre style="font:14px/1.45 ui-sans-serif,system-ui,sans-serif;padding:16px">Yönetim paneli hatası: '
+        . htmlspecialchars((string) ($err['message'] ?? ''), ENT_QUOTES, 'UTF-8')
+        . "\n" . htmlspecialchars((string) ($err['file'] ?? '') . ':' . (string) ($err['line'] ?? ''), ENT_QUOTES, 'UTF-8')
+        . '</pre>';
+});
+
 $httpsOn = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
-    || ((string) ($_SERVER['SERVER_PORT'] ?? '') === '443');
+    || ((string) ($_SERVER['SERVER_PORT'] ?? '') === '443')
+    || (strtolower((string) ($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '')) === 'https');
 
 if (PHP_VERSION_ID >= 70300) {
     session_set_cookie_params(array(
@@ -15,7 +35,9 @@ if (PHP_VERSION_ID >= 70300) {
 } else {
     session_set_cookie_params(0, '/', '', $httpsOn, true);
 }
-session_start();
+if (session_status() !== PHP_SESSION_ACTIVE) {
+    session_start();
+}
 
 header('Content-Type: text/html; charset=UTF-8');
 header('X-Frame-Options: SAMEORIGIN');
@@ -30,7 +52,11 @@ if (!$pdo instanceof PDO) {
     exit;
 }
 
-cms_seed($pdo);
+try {
+    cms_seed($pdo);
+} catch (Throwable $seedError) {
+    error_log('cms_seed: ' . $seedError->getMessage());
+}
 
 $allowedPages = [
     'dashboard'  => 'dashboard.php',

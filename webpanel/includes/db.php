@@ -356,29 +356,29 @@ function cms_ensure_schema(PDO $pdo): void
             KEY idx_contact_read (is_read)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
     );
-    $pdo->exec(
-        "CREATE TABLE IF NOT EXISTS slides (
-            id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-            title VARCHAR(255) NOT NULL DEFAULT '',
-            subtitle TEXT NULL,
-            button_text VARCHAR(120) NULL,
-            link_url VARCHAR(500) NULL,
-            image VARCHAR(255) NULL,
-            sort_order INT UNSIGNED NOT NULL DEFAULT 0,
-            is_active TINYINT(1) NOT NULL DEFAULT 1,
-            created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            PRIMARY KEY (id),
-            KEY idx_slides_active_order (is_active, sort_order)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
-    );
     try {
+        $pdo->exec(
+            "CREATE TABLE IF NOT EXISTS slides (
+                id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+                title VARCHAR(255) NOT NULL DEFAULT '',
+                subtitle TEXT NULL,
+                button_text VARCHAR(120) NULL,
+                link_url VARCHAR(500) NULL,
+                image VARCHAR(255) NULL,
+                sort_order INT UNSIGNED NOT NULL DEFAULT 0,
+                is_active TINYINT(1) NOT NULL DEFAULT 1,
+                created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                PRIMARY KEY (id),
+                KEY idx_slides_active_order (is_active, sort_order)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
+        );
         $pdo->exec("INSERT IGNORE INTO options (option_key, option_value) VALUES ('slider_autoplay', '1')");
         $pdo->exec("INSERT IGNORE INTO options (option_key, option_value) VALUES ('slider_interval', '5000')");
         $pdo->exec("INSERT IGNORE INTO options (option_key, option_value) VALUES ('slider_enabled', '1')");
+        cms_seed_slides($pdo);
     } catch (Throwable $e) {
         // ignore
     }
-
     try {
         $iletisim = $pdo->query("SELECT id, content FROM site_pages WHERE slug = 'iletisim' LIMIT 1")->fetch();
         if ($iletisim && is_string($iletisim['content']) && strpos($iletisim['content'], 'yakında eklenecek') !== false) {
@@ -390,7 +390,6 @@ function cms_ensure_schema(PDO $pdo): void
     } catch (Throwable $e) {
         // ignore
     }
-    cms_seed_slides($pdo);
 }
 
 function media_src($path)
