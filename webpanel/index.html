@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giriş — CMS Yönetim</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        wp: { accent: '#2271b1', sidebar: '#0f172a' }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-slate-100 text-slate-800 antialiased">
+<div id="app"></div>
+<script>
+(function () {
+    var ICONS = {
+        home: '<svg xmlns="http://www.w3.org/2000/svg" class="h-[18px] w-[18px] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955a1.126 1.126 0 0 1 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" /></svg>',
+        doc: '<svg xmlns="http://www.w3.org/2000/svg" class="h-[18px] w-[18px] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" /></svg>',
+        pages: '<svg xmlns="http://www.w3.org/2000/svg" class="h-[18px] w-[18px] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M6 6.878V6a2.25 2.25 0 0 1 2.25-2.25h7.5A2.25 2.25 0 0 1 18 6v.878m-12 0c.235-.083.487-.128.75-.128h10.5c.263 0 .515.045.75.128m-12 0A2.25 2.25 0 0 0 4.5 9v.878m13.5-3A2.25 2.25 0 0 1 19.5 9v.878m0 0a2.246 2.246 0 0 0-.75-.128H5.25c-.263 0-.515.045-.75.128m15 0A2.25 2.25 0 0 1 21 12v6a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 18v-6c0-.98.626-1.813 1.5-2.122" /></svg>',
+        comments: '<svg xmlns="http://www.w3.org/2000/svg" class="h-[18px] w-[18px] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.076-4.076a1.526 1.526 0 0 1 1.037-.443 48.282 48.282 0 0 0 5.68-.494c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z" /></svg>',
+        inbox: '<svg xmlns="http://www.w3.org/2000/svg" class="h-[18px] w-[18px] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 13.5h3.86a2.25 2.25 0 0 1 2.012 1.244l.256.512a2.25 2.25 0 0 0 2.013 1.244h3.218a2.25 2.25 0 0 0 2.013-1.244l.256-.512a2.25 2.25 0 0 1 2.013-1.244h3.859M2.25 13.5V6A2.25 2.25 0 0 1 4.5 3.75h15A2.25 2.25 0 0 1 21.75 6v7.5m-19.5 0V18A2.25 2.25 0 0 0 4.5 20.25h15A2.25 2.25 0 0 0 21.75 18v-4.5" /></svg>',
+        media: '<svg xmlns="http://www.w3.org/2000/svg" class="h-[18px] w-[18px] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909M3.75 21h16.5A1.5 1.5 0 0 0 21.75 19.5V4.5A1.5 1.5 0 0 0 20.25 3H3.75A1.5 1.5 0 0 0 2.25 4.5v15A1.5 1.5 0 0 0 3.75 21Z" /></svg>',
+        users: '<svg xmlns="http://www.w3.org/2000/svg" class="h-[18px] w-[18px] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" /></svg>',
+        cog: '<svg xmlns="http://www.w3.org/2000/svg" class="h-[18px] w-[18px] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 0 1 0 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.759 0 0 1 0-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /></svg>'
+    };
+
+    var SEED = {
+        user: { display_name: 'Yönetici', username: 'admin', role: 'admin' },
+        settings: {
+            site_title: 'Kodcu',
+            site_tagline: 'Yazılar, sayfalar ve projeler',
+            site_url: 'https://kodcu.site/',
+            posts_per_page: '10'
+        },
+        categories: [
+            { id: 1, name: 'Haberler', slug: 'haberler', post_count: 1 },
+            { id: 2, name: 'Rehber', slug: 'rehber', post_count: 1 },
+            { id: 3, name: 'Duyurular', slug: 'duyurular', post_count: 1 },
+            { id: 4, name: 'Blog', slug: 'blog', post_count: 1 }
+        ],
+        posts: [
+            { id: 1, title: 'Paylaşımlı sunucuda CMS kurulumu', slug: 'paylasimli-sunucuda-cms-kurulumu', excerpt: 'FTP, MySQL ve dosya izinleriyle ilk kurulumu özetler.', content: 'Bu yazı, FTP ile yüklenen vanilla PHP yönetim panelinin ilk örnek içeriğidir.', status: 'publish', views: 1284, author: 'Yönetici', categories: 'Haberler', created_at: '12.08.2026 10:20' },
+            { id: 2, title: 'Güvenli yönlendirme ve beyaz liste', slug: 'guvenli-yonlendirme-ve-beyaz-liste', excerpt: 'LFI riskini ortadan kaldıran include mimarisi.', content: 'Sayfa parametresi yalnızca izin verilen anahtarlarla eşleşir.', status: 'publish', views: 876, author: 'Yönetici', categories: 'Rehber', created_at: '20.08.2026 14:05' },
+            { id: 3, title: 'Yazı düzenleyici ipuçları', slug: 'yazi-duzenleyici-ipuclari', excerpt: 'Klasik iki sütunlu düzenleyici kullanımı.', content: 'Başlık, içerik ve özet alanlarını doldurduktan sonra taslak veya yayımlama seçebilirsiniz.', status: 'draft', views: 42, author: 'Yönetici', categories: 'Duyurular', created_at: '01.09.2026 09:12' },
+            { id: 4, title: 'Medya yükleme kuralları', slug: 'medya-yukleme-kurallari', excerpt: 'Yükleme kutusu ve dosya doğrulama.', content: 'Öne çıkan görseller JPEG, PNG, WebP veya GIF olmalıdır. Azami boyut 5 MB’dır.', status: 'publish', views: 533, author: 'Yönetici', categories: 'Blog', created_at: '03.09.2026 18:40' }
+        ],
+        pages: [
+            { id: 1, title: 'Hakkında', slug: 'hakkinda', status: 'publish', updated_at: '09.09.2026 15:21', content: 'Kodcu; yazılım, web ve sunucu notlarını toplayan bir geliştirici günlüğüdür.' },
+            { id: 2, title: 'İletişim', slug: 'iletisim', status: 'publish', updated_at: '09.09.2026 15:21', content: 'Öneri, hata bildirimi veya iş birliği için formu kullanabilirsiniz.' },
+            { id: 3, title: 'Gizlilik', slug: 'gizlilik', status: 'draft', updated_at: '09.09.2026 15:21', content: 'Taslak gizlilik metni.' }
+        ],
+        comments: [
+            { id: 1, author_name: 'Ayşe Kaya', content: 'Kurulum adımları net olmuş, teşekkürler.', status: 'approved', created_at: '12.08.2026 11:02', title: 'Paylaşımlı sunucuda CMS kurulumu' },
+            { id: 2, author_name: 'Mert Demir', content: 'PDO örnekleri işime yaradı.', status: 'approved', created_at: '12.08.2026 16:40', title: 'Paylaşımlı sunucuda CMS kurulumu' },
+            { id: 3, author_name: 'Ziyaretçi', content: 'Onay bekleyen bir yorum.', status: 'pending', created_at: '03.09.2026 19:10', title: 'Paylaşımlı sunucuda CMS kurulumu' }
+        ],
+        messages: [
+            { id: 1, name: 'Ece Yılmaz', email: 'ece@example.com', message: 'Konuk yazı göndermek istiyorum, iletişim kurabilir miyiz?', is_read: 0, created_at: '08.09.2026 13:22' }
+        ],
+        users: [
+            { id: 1, display_name: 'Yönetici', username: 'admin', email: 'admin@example.com', role: 'Yönetici', created_at: '12.08.2026 10:00' },
+            { id: 2, display_name: 'Editör', username: 'editor', email: 'editor@example.com', role: 'Editör', created_at: '12.08.2026 10:00' }
+        ]
+    };
+
+    var PAGE_TITLES = {
+        dashboard: 'Başlangıç',
+        posts: 'Tüm Yazılar',
+        'post-new': 'Yeni Yazı',
+        categories: 'Kategoriler',
+        pages: 'Sayfalar',
+        media: 'Medya Kütüphanesi',
+        comments: 'Yorumlar',
+        messages: 'Mesajlar',
+        users: 'Kullanıcılar',
+        settings: 'Ayarlar'
+    };
+
+    var state = {
+        loggedIn: sessionStorage.getItem('cms_preview_auth') === '1',
+        page: 'dashboard',
+        q: '',
+        status: '',
+        commentStatus: 'pending',
+        flash: null,
+        loginError: '',
+        editPostId: 0,
+        editPageId: 0
+    };
+
+    function esc(value) {
+        return String(value == null ? '' : value)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
+
+    function fmt(n) {
+        return Number(n).toLocaleString('tr-TR');
+    }
+
+    function parseHash() {
+        var raw = (location.hash || '#dashboard').replace(/^#/, '');
+        var parts = raw.split('?');
+        var page = parts[0] || 'dashboard';
+        var params = {};
+        if (parts[1]) {
+            parts[1].split('&').forEach(function (pair) {
+                var kv = pair.split('=');
+                params[decodeURIComponent(kv[0] || '')] = decodeURIComponent(kv[1] || '');
+            });
+        }
+        if (page === 'logout') {
+            sessionStorage.removeItem('cms_preview_auth');
+            state.loggedIn = false;
+            location.hash = '#login';
+            return;
+        }
+        state.page = PAGE_TITLES[page] ? page : (state.loggedIn ? 'dashboard' : 'login');
+        state.q = params.q || '';
+        state.status = params.status || (page === 'comments' ? 'pending' : '');
+        state.editPostId = parseInt(params.id || '0', 10) || 0;
+        state.editPageId = page === 'pages' ? (parseInt(params.id || '0', 10) || 0) : 0;
+        if (page === 'comments' && !params.status) state.commentStatus = 'pending';
+        else if (page === 'comments') state.commentStatus = state.status || 'all';
+    }
+
+    function go(hash) {
+        location.hash = hash;
+    }
+
+    function setFlash(type, message) {
+        state.flash = { type: type, message: message };
+    }
+
+    function pendingComments() {
+        return SEED.comments.filter(function (c) { return c.status === 'pending'; }).length;
+    }
+
+    function unreadMessages() {
+        return SEED.messages.filter(function (m) { return !m.is_read; }).length;
+    }
+
+    function navClass(page, current) {
+        return page === current
+            ? 'bg-slate-800 text-white border-l-[3px] border-[#2271b1]'
+            : 'text-slate-300 hover:bg-slate-800/80 hover:text-white border-l-[3px] border-transparent';
+    }
+
+    function renderLogin() {
+        document.title = 'Giriş — CMS Yönetim';
+        return '<div class="min-h-screen bg-slate-100 flex items-center justify-center p-4">' +
+            '<div class="w-full max-w-md">' +
+            '<div class="mb-4 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">GitHub Pages önizlemesi. PHP/MySQL yok; giriş tarayıcıda simüle edilir.</div>' +
+            '<div class="bg-white rounded-lg shadow-sm border border-slate-200 p-8">' +
+            '<div class="flex items-center gap-3 mb-6">' +
+            '<span class="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-slate-900 text-white">' +
+            '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Zm0 0v-4m0-10v.01" /></svg>' +
+            '</span>' +
+            '<div><h1 class="text-lg font-semibold text-slate-900">CMS Yönetim</h1>' +
+            '<p class="text-sm text-slate-500">Yönetim paneline giriş yapın</p></div></div>' +
+            (state.loginError ? '<div class="mb-4 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">' + esc(state.loginError) + '</div>' : '') +
+            '<form id="login-form" class="space-y-4" autocomplete="on">' +
+            '<div><label for="username" class="block text-sm font-medium text-slate-700 mb-1">Kullanıcı adı</label>' +
+            '<input id="username" name="username" type="text" required autofocus class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"></div>' +
+            '<div><label for="password" class="block text-sm font-medium text-slate-700 mb-1">Şifre</label>' +
+            '<input id="password" name="password" type="password" required class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"></div>' +
+            '<button type="submit" class="w-full rounded-md bg-[#2271b1] px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-800">Giriş yap</button>' +
+            '</form>' +
+            '<p class="mt-4 text-xs text-slate-400">Varsayılan: <span class="font-mono">admin</span> / <span class="font-mono">Admin123!</span></p>' +
+            '<p class="mt-3 text-xs text-slate-400"><a class="text-[#2271b1] hover:underline" href="../">Ziyaretçi sitesine dön</a></p>' +
+            '</div></div></div>';
+    }
+
+    function renderShell(inner) {
+        var page = state.page;
+        var postsOpen = ['posts', 'post-new', 'categories'].indexOf(page) !== -1;
+        var pending = pendingComments();
+        var unread = unreadMessages();
+        document.title = (PAGE_TITLES[page] || 'Yönetim') + ' — CMS Yönetim';
+        return '<div id="admin-shell" class="min-h-screen lg:grid lg:grid-cols-[15rem_1fr] lg:grid-rows-[3.5rem_1fr]">' +
+            '<header class="sticky top-0 z-30 col-start-1 lg:col-start-2 row-start-1 flex h-14 items-center gap-3 border-b border-slate-200 bg-white px-4">' +
+            '<button type="button" id="sidebar-toggle" class="lg:hidden rounded-md p-2 text-slate-600 hover:bg-slate-100" aria-label="Menüyü aç">' +
+            '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" /></svg></button>' +
+            '<a href="../" class="hidden sm:inline-flex items-center gap-1.5 rounded-md border border-slate-200 px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-50">Siteyi görüntüle</a>' +
+            '<form id="header-search" class="flex-1 max-w-md"><label class="relative block">' +
+            '<span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-4.35-4.35M17 11a6 6 0 1 1-12 0 6 6 0 0 1 12 0Z" /></svg></span>' +
+            '<input type="search" name="q" value="' + esc(state.q) + '" placeholder="Yazılarda ara…" class="w-full rounded-md border border-slate-200 bg-slate-50 py-1.5 pl-9 pr-3 text-sm text-slate-800 placeholder:text-slate-400 focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-200">' +
+            '</label></form>' +
+            '<div class="ml-auto flex items-center gap-1">' +
+            '<div class="relative" data-dropdown>' +
+            '<button type="button" class="relative rounded-md p-2 text-slate-600 hover:bg-slate-100" data-dropdown-button aria-label="Bildirimler">' +
+            '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" /></svg>' +
+            ((pending || unread) ? '<span class="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-red-500"></span>' : '') +
+            '</button>' +
+            '<div class="hidden absolute right-0 mt-2 w-80 rounded-lg border border-slate-200 bg-white py-2 shadow-lg z-40" data-dropdown-panel>' +
+            '<p class="px-3 pb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">Bildirimler</p>' +
+            '<a href="#comments?status=pending" class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50">' + (pending ? pending + ' yorum onay bekliyor.' : 'Onay bekleyen yorum yok.') + '</a>' +
+            '<a href="#messages" class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50">' + (unread ? unread + ' yeni iletişim mesajı.' : 'Yeni iletişim mesajı yok.') + '</a>' +
+            '</div></div>' +
+            '<div class="relative" data-dropdown>' +
+            '<button type="button" class="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm text-slate-700 hover:bg-slate-100" data-dropdown-button>' +
+            '<span class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-slate-900 text-xs font-semibold text-white">Y</span>' +
+            '<span class="hidden md:block font-medium">Yönetici</span>' +
+            '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" /></svg>' +
+            '</button>' +
+            '<div class="hidden absolute right-0 mt-2 w-52 rounded-lg border border-slate-200 bg-white py-1 shadow-lg z-40" data-dropdown-panel>' +
+            '<a href="#users" class="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50">Profili düzenle</a>' +
+            '<a href="#logout" class="block px-3 py-2 text-sm text-red-600 hover:bg-red-50">Çıkış</a>' +
+            '</div></div></div></header>' +
+            '<aside id="admin-sidebar" class="fixed inset-y-0 left-0 z-40 w-60 -translate-x-full bg-slate-900 text-slate-300 transition-transform lg:static lg:col-start-1 lg:row-start-1 lg:row-span-2 lg:min-h-screen lg:w-auto lg:translate-x-0">' +
+            '<div class="flex h-14 items-center gap-2 border-b border-slate-800 px-4">' +
+            '<span class="inline-flex h-8 w-8 items-center justify-center rounded-md bg-[#2271b1] text-white"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z" /></svg></span>' +
+            '<div class="min-w-0"><p class="truncate text-sm font-semibold text-white">CMS Yönetim</p><p class="truncate text-[11px] text-slate-400">Kontrol paneli</p></div></div>' +
+            '<nav class="py-3 text-sm" aria-label="Yönetim menüsü">' +
+            '<a href="#dashboard" class="flex items-center gap-3 px-4 py-2.5 text-[13px] font-medium ' + navClass('dashboard', page) + '">' + ICONS.home + '<span>Başlangıç</span></a>' +
+            '<div><button type="button" class="flex w-full items-center gap-3 px-4 py-2.5 text-[13px] font-medium ' + (postsOpen ? 'text-white' : 'text-slate-300 hover:bg-slate-800/80 hover:text-white') + '" data-submenu-toggle="submenu-posts" aria-expanded="' + (postsOpen ? 'true' : 'false') + '">' +
+            ICONS.doc + '<span class="flex-1 text-left">Yazılar</span>' +
+            '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-transform ' + (postsOpen ? 'rotate-180' : '') + '" data-submenu-chevron fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" /></svg></button>' +
+            '<div id="submenu-posts" class="' + (postsOpen ? '' : 'hidden') + ' bg-slate-950/50 py-1">' +
+            '<a href="#posts" class="block py-2 pl-12 pr-4 text-[13px] ' + (page === 'posts' ? 'text-white' : 'text-slate-400 hover:text-white') + '">Tüm Yazılar</a>' +
+            '<a href="#post-new" class="block py-2 pl-12 pr-4 text-[13px] ' + (page === 'post-new' ? 'text-white' : 'text-slate-400 hover:text-white') + '">Yeni Ekle</a>' +
+            '<a href="#categories" class="block py-2 pl-12 pr-4 text-[13px] ' + (page === 'categories' ? 'text-white' : 'text-slate-400 hover:text-white') + '">Kategoriler</a>' +
+            '</div></div>' +
+            '<a href="#pages" class="flex items-center gap-3 px-4 py-2.5 text-[13px] font-medium ' + navClass('pages', page) + '">' + ICONS.pages + '<span>Sayfalar</span></a>' +
+            '<a href="#media" class="flex items-center gap-3 px-4 py-2.5 text-[13px] font-medium ' + navClass('media', page) + '">' + ICONS.media + '<span>Medya Kütüphanesi</span></a>' +
+            '<a href="#comments?status=pending" class="flex items-center gap-3 px-4 py-2.5 text-[13px] font-medium ' + navClass('comments', page) + '">' + ICONS.comments + '<span class="flex-1">Yorumlar</span>' +
+            (pending ? '<span class="rounded-full bg-amber-500 px-1.5 py-0.5 text-[10px] font-semibold text-slate-900">' + pending + '</span>' : '') + '</a>' +
+            '<a href="#messages" class="flex items-center gap-3 px-4 py-2.5 text-[13px] font-medium ' + navClass('messages', page) + '">' + ICONS.inbox + '<span class="flex-1">Mesajlar</span>' +
+            (unread ? '<span class="rounded-full bg-sky-400 px-1.5 py-0.5 text-[10px] font-semibold text-slate-900">' + unread + '</span>' : '') + '</a>' +
+            '<a href="#users" class="flex items-center gap-3 px-4 py-2.5 text-[13px] font-medium ' + navClass('users', page) + '">' + ICONS.users + '<span>Kullanıcılar</span></a>' +
+            '<a href="#settings" class="flex items-center gap-3 px-4 py-2.5 text-[13px] font-medium ' + navClass('settings', page) + '">' + ICONS.cog + '<span>Ayarlar</span></a>' +
+            '</nav></aside>' +
+            '<div id="sidebar-backdrop" class="fixed inset-0 z-30 hidden bg-slate-900/50 lg:hidden"></div>' +
+            '<main class="col-start-1 lg:col-start-2 row-start-2 min-w-0 p-4 lg:p-6">' +
+            '<div class="mb-4 rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">Bu GitHub Pages kopyası yalnızca önizlemedir. Canlı kurulum için PHP + MySQL gerekir.</div>' +
+            (state.flash ? '<div class="mb-4 rounded-md border px-4 py-3 text-sm ' + (state.flash.type === 'error' ? 'border-red-200 bg-red-50 text-red-700' : 'border-emerald-200 bg-emerald-50 text-emerald-800') + '">' + esc(state.flash.message) + '</div>' : '') +
+            inner +
+            '</main></div>';
+    }
+
+    function statusBadge(status) {
+        return status === 'publish'
+            ? '<span class="inline-flex rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700">Yayımlanmış</span>'
+            : '<span class="inline-flex rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">Taslak</span>';
+    }
+
+    function renderDashboard() {
+        var views = SEED.posts.reduce(function (s, p) { return s + p.views; }, 0);
+        var rows = SEED.posts.slice().sort(function (a, b) { return a.id < b.id ? 1 : -1; }).map(function (row) {
+            return '<tr class="hover:bg-slate-50"><td class="px-4 py-3"><a href="#post-new?id=' + row.id + '" class="font-medium text-slate-900 hover:text-[#2271b1]">' + esc(row.title) + '</a></td>' +
+                '<td class="px-4 py-3 text-slate-600">' + esc(row.author) + '</td><td class="px-4 py-3">' + statusBadge(row.status) + '</td>' +
+                '<td class="px-4 py-3 text-right tabular-nums text-slate-600">' + fmt(row.views) + '</td>' +
+                '<td class="px-4 py-3 text-slate-500 whitespace-nowrap">' + esc(row.created_at) + '</td></tr>';
+        }).join('');
+        var pending = pendingComments();
+        var unread = unreadMessages();
+        return '<div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between"><div>' +
+            '<h1 class="text-2xl font-semibold text-slate-900">Başlangıç</h1>' +
+            '<p class="mt-1 text-sm text-slate-500">Yazılar ve sayfalar yayımlanınca ziyaretçi sitesinde görünür.</p></div>' +
+            '<a href="../" class="inline-flex items-center justify-center rounded-md bg-[#2271b1] px-4 py-2 text-sm font-semibold text-white hover:bg-blue-800">Siteyi aç</a></div>' +
+            '<div class="mb-6 bg-white rounded-lg shadow-sm border border-slate-200 p-4 text-sm text-slate-600">' +
+            '<p><span class="font-semibold text-slate-900">Ziyaretçi sitesi:</span> <a class="text-[#2271b1] hover:underline" href="../">GitHub Pages önizlemesi</a></p>' +
+            '<p class="mt-1"><span class="font-semibold text-slate-900">Yönetim paneli:</span> bu sayfa</p>' +
+            '<p class="mt-2 text-slate-500">Yazılar → Yeni Ekle → Yayımla. Canlı sitede PHP hosting gerekir.</p></div>' +
+            ((pending || unread) ? '<div class="mb-6 grid grid-cols-1 sm:grid-cols-2 gap-4">' +
+                (pending ? '<a href="#comments?status=pending" class="block bg-amber-50 border border-amber-200 rounded-lg p-4 hover:bg-amber-100/70"><p class="text-sm font-semibold text-amber-900">' + pending + ' yorum onay bekliyor</p><p class="mt-1 text-xs text-amber-800">Onaylamak için tıklayın.</p></a>' : '') +
+                (unread ? '<a href="#messages" class="block bg-sky-50 border border-sky-200 rounded-lg p-4 hover:bg-sky-100/70"><p class="text-sm font-semibold text-sky-900">' + unread + ' yeni iletişim mesajı</p><p class="mt-1 text-xs text-sky-800">Gelen kutusunu açın.</p></a>' : '') +
+                '</div>' : '') +
+            '<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 mb-6">' +
+            statCard('Toplam Yazı', SEED.posts.length, 'bg-blue-50 text-[#2271b1]') +
+            statCard('Görüntülenme', fmt(views), 'bg-emerald-50 text-emerald-600') +
+            statCard('Yorumlar', SEED.comments.length, 'bg-amber-50 text-amber-600') +
+            statCard('Kullanıcılar', SEED.users.length, 'bg-violet-50 text-violet-600') +
+            '</div>' +
+            '<div class="grid grid-cols-1 xl:grid-cols-3 gap-6"><div class="xl:col-span-2 bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">' +
+            '<div class="flex items-center justify-between px-4 py-3 border-b border-slate-200"><h2 class="text-sm font-semibold text-slate-900">Son Yazılar</h2><a href="#posts" class="text-sm text-[#2271b1] hover:underline">Tümünü gör</a></div>' +
+            '<div class="overflow-x-auto"><table class="min-w-full text-sm"><thead class="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500"><tr>' +
+            '<th class="px-4 py-3 font-medium">Başlık</th><th class="px-4 py-3 font-medium">Yazar</th><th class="px-4 py-3 font-medium">Durum</th><th class="px-4 py-3 font-medium text-right">Görüntülenme</th><th class="px-4 py-3 font-medium">Tarih</th>' +
+            '</tr></thead><tbody class="divide-y divide-slate-100">' + rows + '</tbody></table></div></div>' +
+            '<div class="bg-white rounded-lg shadow-sm border border-slate-200 p-4"><h2 class="text-sm font-semibold text-slate-900 mb-1">Haftalık yazı temposu</h2><p class="text-xs text-slate-500 mb-4">Son 7 günde oluşturulan yazılar</p>' +
+            '<div class="h-48 flex items-end gap-2">' +
+            [18, 18, 18, 18, 40, 18, 70].map(function (h, i) {
+                var labels = ['03.09', '04.09', '05.09', '06.09', '07.09', '08.09', '09.09'];
+                return '<div class="flex-1 flex flex-col items-center gap-2"><div class="w-full rounded-t bg-blue-200 hover:bg-[#2271b1] transition-colors" style="height:' + h + '%"></div><span class="text-[10px] text-slate-400">' + labels[i] + '</span></div>';
+            }).join('') +
+            '</div></div></div>';
+    }
+
+    function statCard(label, value, iconCls) {
+        return '<div class="bg-white rounded-lg shadow-sm border border-slate-200 p-4 flex items-start gap-4"><span class="inline-flex h-11 w-11 items-center justify-center rounded-lg ' + iconCls + '"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m6-6H6" /></svg></span><div><p class="text-sm text-slate-500">' + label + '</p><p class="text-2xl font-semibold text-slate-900">' + value + '</p></div></div>';
+    }
+
+    function filteredPosts() {
+        return SEED.posts.filter(function (p) {
+            if (state.status && p.status !== state.status) return false;
+            if (state.q) {
+                var q = state.q.toLocaleLowerCase('tr');
+                return (p.title + ' ' + p.excerpt).toLocaleLowerCase('tr').indexOf(q) !== -1;
+            }
+            return true;
+        });
+    }
+
+    function renderPosts() {
+        var list = filteredPosts();
+        var rows = list.map(function (row) {
+            return '<tr class="hover:bg-slate-50"><td class="px-4 py-3"><a href="#post-new?id=' + row.id + '" class="font-medium text-slate-900 hover:text-[#2271b1]">' + esc(row.title) + '</a></td>' +
+                '<td class="px-4 py-3 text-slate-600">' + esc(row.author) + '</td>' +
+                '<td class="px-4 py-3 text-slate-500">' + esc(row.categories) + '</td>' +
+                '<td class="px-4 py-3">' + statusBadge(row.status) + '</td>' +
+                '<td class="px-4 py-3 text-right tabular-nums text-slate-600">' + fmt(row.views) + '</td>' +
+                '<td class="px-4 py-3 text-slate-500 whitespace-nowrap">' + esc(row.created_at) + '</td>' +
+                '<td class="px-4 py-3 text-right whitespace-nowrap"><a href="#post-new?id=' + row.id + '" class="text-[#2271b1] hover:underline">Düzenle</a>' +
+                '<button type="button" data-delete-post="' + row.id + '" class="ml-2 text-red-600 hover:underline">Sil</button></td></tr>';
+        }).join('');
+        var q = state.q ? '&q=' + encodeURIComponent(state.q) : '';
+        return '<div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"><div>' +
+            '<h1 class="text-2xl font-semibold text-slate-900">Yazılar</h1><p class="mt-1 text-sm text-slate-500">' + list.length + ' kayıt listeleniyor.</p></div>' +
+            '<a href="#post-new" class="inline-flex items-center justify-center rounded-md bg-[#2271b1] px-4 py-2 text-sm font-semibold text-white hover:bg-blue-800">Yeni ekle</a></div>' +
+            '<div class="bg-white rounded-lg shadow-sm border border-slate-200"><div class="flex flex-col gap-3 border-b border-slate-200 p-4 sm:flex-row sm:items-center">' +
+            '<div class="flex gap-2 text-sm">' +
+            '<a href="#posts' + (state.q ? '?q=' + encodeURIComponent(state.q) : '') + '" class="' + (state.status === '' ? 'font-semibold text-slate-900' : 'text-slate-500 hover:text-slate-800') + '">Tümü</a><span class="text-slate-300">|</span>' +
+            '<a href="#posts?status=publish' + q + '" class="' + (state.status === 'publish' ? 'font-semibold text-slate-900' : 'text-slate-500 hover:text-slate-800') + '">Yayımlanmış</a><span class="text-slate-300">|</span>' +
+            '<a href="#posts?status=draft' + q + '" class="' + (state.status === 'draft' ? 'font-semibold text-slate-900' : 'text-slate-500 hover:text-slate-800') + '">Taslak</a></div>' +
+            '<form id="posts-search" class="sm:ml-auto flex gap-2"><input type="search" name="q" value="' + esc(state.q) + '" placeholder="Yazı ara…" class="rounded-md border border-slate-200 px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200">' +
+            '<button type="submit" class="rounded-md border border-slate-200 bg-slate-50 px-3 py-1.5 text-sm hover:bg-slate-100">Ara</button></form></div>' +
+            '<div class="overflow-x-auto"><table class="min-w-full text-sm"><thead class="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500"><tr>' +
+            '<th class="px-4 py-3 font-medium">Başlık</th><th class="px-4 py-3 font-medium">Yazar</th><th class="px-4 py-3 font-medium">Kategoriler</th><th class="px-4 py-3 font-medium">Durum</th><th class="px-4 py-3 font-medium text-right">Görüntülenme</th><th class="px-4 py-3 font-medium">Tarih</th><th class="px-4 py-3 font-medium text-right">İşlem</th>' +
+            '</tr></thead><tbody class="divide-y divide-slate-100">' +
+            (rows || '<tr><td colspan="7" class="px-4 py-10 text-center text-slate-500">Kayıt bulunamadı.</td></tr>') +
+            '</tbody></table></div></div>';
+    }
+
+    function renderPostNew() {
+        var post = SEED.posts.filter(function (p) { return p.id === state.editPostId; })[0] || {
+            id: 0, title: '', content: '', excerpt: '', status: 'draft', categories: ''
+        };
+        var isEdit = post.id > 0;
+        var cats = SEED.categories.map(function (c) {
+            var checked = post.categories && post.categories.indexOf(c.name) !== -1;
+            return '<label class="flex items-center gap-2 text-sm text-slate-700"><input type="checkbox" ' + (checked ? 'checked' : '') + ' class="rounded border-slate-300 text-[#2271b1] focus:ring-blue-200"> ' + esc(c.name) + '</label>';
+        }).join('');
+        return '<div class="mb-6"><h1 class="text-2xl font-semibold text-slate-900">' + (isEdit ? 'Yazıyı düzenle' : 'Yeni yazı ekle') + '</h1>' +
+            '<p class="mt-1 text-sm text-slate-500">Yayımlayınca yazı ziyaretçi sitesinde görünür.</p></div>' +
+            '<form id="post-form" class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">' +
+            '<div class="lg:col-span-2 space-y-4">' +
+            '<div class="bg-white rounded-lg shadow-sm border border-slate-200 p-4"><input name="title" required value="' + esc(post.title) + '" placeholder="Başlık ekle" class="w-full border-0 p-0 text-2xl font-bold text-slate-900 placeholder:text-slate-300 focus:outline-none"></div>' +
+            '<div class="bg-white rounded-lg shadow-sm border border-slate-200 p-4"><label class="mb-2 block text-sm font-medium text-slate-700">İçerik</label>' +
+            '<textarea name="content" rows="18" placeholder="Yazınızı buraya yazın…" class="w-full resize-y rounded-md border border-slate-200 px-3 py-2 text-sm text-slate-800 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200">' + esc(post.content) + '</textarea></div>' +
+            '<div class="bg-white rounded-lg shadow-sm border border-slate-200 p-4"><label class="mb-2 block text-sm font-medium text-slate-700">Özet</label>' +
+            '<textarea name="excerpt" rows="4" class="w-full resize-y rounded-md border border-slate-200 px-3 py-2 text-sm text-slate-800 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200">' + esc(post.excerpt) + '</textarea></div></div>' +
+            '<div class="space-y-4 lg:sticky lg:top-20">' +
+            '<div class="bg-white rounded-lg shadow-sm border border-slate-200"><div class="border-b border-slate-200 px-4 py-3"><h2 class="text-sm font-semibold text-slate-900">Yayımla</h2></div>' +
+            '<div class="space-y-3 p-4 text-sm"><p class="flex items-center justify-between text-slate-600"><span>Durum</span><span class="font-medium text-slate-900">' + (post.status === 'publish' ? 'Yayımlanmış' : 'Taslak') + '</span></p>' +
+            '<button type="submit" name="form_action" value="draft" class="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">Taslak kaydet</button>' +
+            '<button type="submit" name="form_action" value="publish" class="w-full rounded-md bg-[#2271b1] px-3 py-2 text-sm font-semibold text-white hover:bg-blue-800">Yayımla</button></div></div>' +
+            '<div class="bg-white rounded-lg shadow-sm border border-slate-200"><div class="border-b border-slate-200 px-4 py-3"><h2 class="text-sm font-semibold text-slate-900">Kategoriler</h2></div><div class="p-4 space-y-2">' + cats + '</div></div>' +
+            '<div class="bg-white rounded-lg shadow-sm border border-slate-200"><div class="border-b border-slate-200 px-4 py-3"><h2 class="text-sm font-semibold text-slate-900">Öne çıkan görsel</h2></div>' +
+            '<div class="p-4"><label class="flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-slate-200 bg-slate-50 px-4 py-8 text-center hover:border-blue-300">' +
+            '<span class="text-sm font-medium text-slate-700">Görsel seç veya sürükle</span><span class="mt-1 text-xs text-slate-400">JPEG, PNG, WebP, GIF — en fazla 5 MB</span>' +
+            '<input type="file" accept="image/jpeg,image/png,image/webp,image/gif" class="sr-only"></label></div></div></div></form>';
+    }
+
+    function renderCategories() {
+        var rows = SEED.categories.map(function (c) {
+            return '<tr class="hover:bg-slate-50"><td class="px-4 py-3 font-medium text-slate-900">' + esc(c.name) + '</td>' +
+                '<td class="px-4 py-3 text-slate-500 font-mono text-xs">' + esc(c.slug) + '</td>' +
+                '<td class="px-4 py-3 text-right">' + c.post_count + '</td>' +
+                '<td class="px-4 py-3 text-right"><button type="button" data-delete-cat="' + c.id + '" class="text-red-600 hover:underline">Sil</button></td></tr>';
+        }).join('');
+        return '<div class="mb-6"><h1 class="text-2xl font-semibold text-slate-900">Kategoriler</h1><p class="mt-1 text-sm text-slate-500">Yazıları gruplamak için kategorileri yönetin.</p></div>' +
+            '<div class="grid grid-cols-1 lg:grid-cols-3 gap-6"><div class="bg-white rounded-lg shadow-sm border border-slate-200 p-4 h-fit">' +
+            '<h2 class="text-sm font-semibold text-slate-900 mb-4">Yeni kategori</h2>' +
+            '<form id="cat-form" class="space-y-3"><label class="mb-1 block text-sm font-medium text-slate-700">Ad</label>' +
+            '<input name="name" required class="w-full rounded-md border border-slate-200 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200">' +
+            '<button class="rounded-md bg-[#2271b1] px-4 py-2 text-sm font-semibold text-white hover:bg-blue-800">Ekle</button></form></div>' +
+            '<div class="lg:col-span-2 bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden"><table class="min-w-full text-sm"><thead class="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500"><tr>' +
+            '<th class="px-4 py-3 font-medium">Ad</th><th class="px-4 py-3 font-medium">Kalıcı bağlantı</th><th class="px-4 py-3 font-medium text-right">Yazı</th><th class="px-4 py-3 font-medium text-right">İşlem</th>' +
+            '</tr></thead><tbody class="divide-y divide-slate-100">' + rows + '</tbody></table></div></div>';
+    }
+
+    function renderPages() {
+        var edit = SEED.pages.filter(function (p) { return p.id === state.editPageId; })[0];
+        var rows = SEED.pages.map(function (row) {
+            return '<tr class="hover:bg-slate-50' + (row.id === state.editPageId ? ' bg-blue-50/40' : '') + '"><td class="px-4 py-3 font-medium text-slate-900">' + esc(row.title) + '</td>' +
+                '<td class="px-4 py-3 font-mono text-xs text-slate-500">' + esc(row.slug) + '</td><td class="px-4 py-3">' + statusBadge(row.status) + '</td>' +
+                '<td class="px-4 py-3 text-slate-500 whitespace-nowrap">' + esc(row.updated_at) + '</td>' +
+                '<td class="px-4 py-3 text-right"><a href="#pages?id=' + row.id + '" class="text-[#2271b1] hover:underline mr-2">Düzenle</a>' +
+                '<button type="button" data-delete-page="' + row.id + '" class="text-red-600 hover:underline">Sil</button></td></tr>';
+        }).join('');
+        return '<div class="mb-6"><h1 class="text-2xl font-semibold text-slate-900">Sayfalar</h1><p class="mt-1 text-sm text-slate-500">Sabit sayfalar (Hakkında, İletişim vb.). Yayımlananlar üst menüde görünür.</p></div>' +
+            '<div class="grid grid-cols-1 xl:grid-cols-3 gap-6"><div class="bg-white rounded-lg shadow-sm border border-slate-200 p-4 h-fit">' +
+            '<div class="flex items-center justify-between mb-4"><h2 class="text-sm font-semibold text-slate-900">' + (edit ? 'Sayfayı düzenle' : 'Yeni sayfa') + '</h2>' +
+            (edit ? '<a href="#pages" class="text-xs text-[#2271b1] hover:underline">Yeni oluştur</a>' : '') + '</div>' +
+            '<form id="page-form" class="space-y-3"><input type="hidden" name="page_id" value="' + (edit ? edit.id : 0) + '">' +
+            '<div><label class="mb-1 block text-sm font-medium text-slate-700">Başlık</label><input name="title" required value="' + esc(edit ? edit.title : '') + '" class="w-full rounded-md border border-slate-200 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"></div>' +
+            '<div><label class="mb-1 block text-sm font-medium text-slate-700">İçerik</label><textarea name="content" rows="8" class="w-full rounded-md border border-slate-200 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200">' + esc(edit ? edit.content : '') + '</textarea></div>' +
+            '<div><label class="mb-1 block text-sm font-medium text-slate-700">Durum</label><select name="status" class="w-full rounded-md border border-slate-200 px-3 py-2 text-sm"><option value="draft"' + (edit && edit.status === 'draft' ? ' selected' : '') + '>Taslak</option><option value="publish"' + (edit && edit.status === 'publish' ? ' selected' : '') + '>Yayımlanmış</option></select></div>' +
+            '<button class="rounded-md bg-[#2271b1] px-4 py-2 text-sm font-semibold text-white hover:bg-blue-800">' + (edit ? 'Güncelle' : 'Kaydet') + '</button></form></div>' +
+            '<div class="xl:col-span-2 bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden"><table class="min-w-full text-sm"><thead class="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500"><tr>' +
+            '<th class="px-4 py-3 font-medium">Başlık</th><th class="px-4 py-3 font-medium">Kalıcı bağlantı</th><th class="px-4 py-3 font-medium">Durum</th><th class="px-4 py-3 font-medium">Güncelleme</th><th class="px-4 py-3 font-medium text-right">İşlem</th>' +
+            '</tr></thead><tbody class="divide-y divide-slate-100">' + rows + '</tbody></table></div></div>';
+    }
+
+    function renderMedia() {
+        return '<div class="mb-6"><h1 class="text-2xl font-semibold text-slate-900">Medya Kütüphanesi</h1><p class="mt-1 text-sm text-slate-500">0 dosya</p></div>' +
+            '<div class="bg-white rounded-lg shadow-sm border border-slate-200 p-4 mb-6"><form id="media-form" class="flex flex-col gap-3 sm:flex-row sm:items-end">' +
+            '<div class="flex-1"><label class="mb-1 block text-sm font-medium text-slate-700">Dosya yükle</label>' +
+            '<input type="file" accept="image/jpeg,image/png,image/webp,image/gif" class="block w-full text-sm text-slate-600 file:mr-3 file:rounded-md file:border-0 file:bg-slate-100 file:px-3 file:py-2 file:text-sm file:font-medium"></div>' +
+            '<button class="rounded-md bg-[#2271b1] px-4 py-2 text-sm font-semibold text-white hover:bg-blue-800">Yükle</button></form></div>' +
+            '<div class="bg-white rounded-lg shadow-sm border border-slate-200 px-4 py-12 text-center text-slate-500">Kütüphanede henüz görsel yok.</div>';
+    }
+
+    function renderComments() {
+        var filter = state.commentStatus || 'pending';
+        var counts = { pending: 0, approved: 0, spam: 0 };
+        SEED.comments.forEach(function (c) { counts[c.status] = (counts[c.status] || 0) + 1; });
+        var list = SEED.comments.filter(function (c) { return filter === 'all' || c.status === filter; });
+        var items = list.map(function (row) {
+            var badge = row.status === 'approved' ? 'bg-emerald-50 text-emerald-700' : (row.status === 'spam' ? 'bg-red-50 text-red-700' : 'bg-amber-50 text-amber-700');
+            var label = row.status === 'approved' ? 'Onaylı' : (row.status === 'spam' ? 'Spam' : 'Onay bekliyor');
+            return '<div class="px-4 py-4"><div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between"><div class="min-w-0">' +
+                '<p class="text-sm font-medium text-slate-900">' + esc(row.author_name) + '</p>' +
+                '<p class="text-xs text-slate-400 mt-0.5">' + esc(row.created_at) + ' · ' + esc(row.title) + '</p>' +
+                '<p class="mt-2 text-sm text-slate-700 whitespace-pre-wrap">' + esc(row.content) + '</p></div>' +
+                '<div class="flex flex-wrap gap-2 text-xs shrink-0"><span class="inline-flex rounded-full px-2 py-0.5 font-medium ' + badge + '">' + label + '</span>' +
+                (row.status !== 'approved' ? '<button type="button" data-comment-action="approve" data-id="' + row.id + '" class="text-[#2271b1] hover:underline">Onayla</button>' : '<button type="button" data-comment-action="pending" data-id="' + row.id + '" class="text-slate-600 hover:underline">Beklet</button>') +
+                (row.status !== 'spam' ? '<button type="button" data-comment-action="spam" data-id="' + row.id + '" class="text-amber-700 hover:underline">Spam</button>' : '') +
+                '<button type="button" data-comment-action="delete" data-id="' + row.id + '" class="text-red-600 hover:underline">Sil</button></div></div></div>';
+        }).join('');
+        return '<div class="mb-6"><h1 class="text-2xl font-semibold text-slate-900">Yorumlar</h1><p class="mt-1 text-sm text-slate-500">Ziyaretçi yorumlarını onaylayın veya kaldırın.</p></div>' +
+            '<div class="bg-white rounded-lg shadow-sm border border-slate-200"><div class="flex flex-wrap gap-2 border-b border-slate-200 p-4 text-sm">' +
+            '<a href="#comments?status=all" class="' + (filter === 'all' ? 'font-semibold text-slate-900' : 'text-slate-500') + '">Tümü (' + SEED.comments.length + ')</a><span class="text-slate-300">|</span>' +
+            '<a href="#comments?status=pending" class="' + (filter === 'pending' ? 'font-semibold text-slate-900' : 'text-slate-500') + '">Onay bekleyen (' + counts.pending + ')</a><span class="text-slate-300">|</span>' +
+            '<a href="#comments?status=approved" class="' + (filter === 'approved' ? 'font-semibold text-slate-900' : 'text-slate-500') + '">Onaylı (' + counts.approved + ')</a><span class="text-slate-300">|</span>' +
+            '<a href="#comments?status=spam" class="' + (filter === 'spam' ? 'font-semibold text-slate-900' : 'text-slate-500') + '">Spam (' + (counts.spam || 0) + ')</a></div>' +
+            '<div class="divide-y divide-slate-100">' + (items || '<p class="px-4 py-10 text-center text-sm text-slate-500">Kayıt yok.</p>') + '</div></div>';
+    }
+
+    function renderMessages() {
+        var items = SEED.messages.map(function (row) {
+            return '<div class="px-4 py-4 ' + (!row.is_read ? 'bg-blue-50/40' : '') + '"><div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between"><div class="min-w-0">' +
+                '<p class="text-sm font-medium text-slate-900">' + esc(row.name) + (!row.is_read ? ' <span class="ml-2 inline-flex rounded-full bg-blue-100 px-2 py-0.5 text-[11px] font-medium text-blue-700">Yeni</span>' : '') + '</p>' +
+                '<p class="text-xs text-slate-400 mt-0.5">' + esc(row.email) + ' · ' + esc(row.created_at) + '</p>' +
+                '<p class="mt-2 text-sm text-slate-700">' + esc(row.message) + '</p></div>' +
+                '<div class="flex gap-2 text-xs shrink-0">' +
+                '<button type="button" data-message-action="' + (row.is_read ? 'unread' : 'read') + '" data-id="' + row.id + '" class="text-[#2271b1] hover:underline">' + (row.is_read ? 'Okunmadı' : 'Okundu') + '</button>' +
+                '<button type="button" data-message-action="delete" data-id="' + row.id + '" class="text-red-600 hover:underline">Sil</button></div></div></div>';
+        }).join('');
+        return '<div class="mb-6"><h1 class="text-2xl font-semibold text-slate-900">İletişim mesajları</h1><p class="mt-1 text-sm text-slate-500">Sitedeki iletişim formundan gelen kayıtlar.</p></div>' +
+            '<div class="bg-white rounded-lg shadow-sm border border-slate-200 divide-y divide-slate-100">' +
+            (items || '<p class="px-4 py-10 text-center text-sm text-slate-500">Henüz mesaj yok.</p>') + '</div>';
+    }
+
+    function renderUsers() {
+        var rows = SEED.users.map(function (row) {
+            return '<tr class="hover:bg-slate-50' + (row.id === 1 ? ' bg-blue-50/40' : '') + '"><td class="px-4 py-3 font-medium text-slate-900">' + esc(row.display_name) + '</td>' +
+                '<td class="px-4 py-3 text-slate-600">' + esc(row.username) + '</td><td class="px-4 py-3 text-slate-600">' + esc(row.email) + '</td>' +
+                '<td class="px-4 py-3">' + esc(row.role) + '</td><td class="px-4 py-3 text-slate-500 whitespace-nowrap">' + esc(row.created_at) + '</td></tr>';
+        }).join('');
+        return '<div class="mb-6"><h1 class="text-2xl font-semibold text-slate-900">Kullanıcılar</h1><p class="mt-1 text-sm text-slate-500">Panel erişimi olan hesaplar.</p></div>' +
+            '<div class="grid grid-cols-1 xl:grid-cols-3 gap-6"><div class="bg-white rounded-lg shadow-sm border border-slate-200 p-4 h-fit"><h2 class="text-sm font-semibold text-slate-900 mb-4">Yeni kullanıcı</h2>' +
+            '<form id="user-form" class="space-y-3"><div><label class="mb-1 block text-sm font-medium text-slate-700">Kullanıcı adı</label><input name="username" required class="w-full rounded-md border border-slate-200 px-3 py-2 text-sm"></div>' +
+            '<div><label class="mb-1 block text-sm font-medium text-slate-700">E-posta</label><input name="email" type="email" required class="w-full rounded-md border border-slate-200 px-3 py-2 text-sm"></div>' +
+            '<div><label class="mb-1 block text-sm font-medium text-slate-700">Görünen ad</label><input name="display_name" required class="w-full rounded-md border border-slate-200 px-3 py-2 text-sm"></div>' +
+            '<div><label class="mb-1 block text-sm font-medium text-slate-700">Şifre</label><input name="password" type="password" minlength="8" required class="w-full rounded-md border border-slate-200 px-3 py-2 text-sm"></div>' +
+            '<div><label class="mb-1 block text-sm font-medium text-slate-700">Rol</label><select name="role" class="w-full rounded-md border border-slate-200 px-3 py-2 text-sm"><option value="author">Yazar</option><option value="editor">Editör</option><option value="admin">Yönetici</option></select></div>' +
+            '<button class="rounded-md bg-[#2271b1] px-4 py-2 text-sm font-semibold text-white hover:bg-blue-800">Ekle</button></form></div>' +
+            '<div class="xl:col-span-2 bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden"><table class="min-w-full text-sm"><thead class="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500"><tr>' +
+            '<th class="px-4 py-3 font-medium">Ad</th><th class="px-4 py-3 font-medium">Kullanıcı adı</th><th class="px-4 py-3 font-medium">E-posta</th><th class="px-4 py-3 font-medium">Rol</th><th class="px-4 py-3 font-medium">Kayıt</th>' +
+            '</tr></thead><tbody class="divide-y divide-slate-100">' + rows + '</tbody></table></div></div>';
+    }
+
+    function renderSettings() {
+        var s = SEED.settings;
+        return '<div class="mb-6"><h1 class="text-2xl font-semibold text-slate-900">Ayarlar</h1><p class="mt-1 text-sm text-slate-500">Genel site bilgileri.</p></div>' +
+            '<div class="max-w-2xl bg-white rounded-lg shadow-sm border border-slate-200 p-6"><form id="settings-form" class="space-y-4">' +
+            '<div><label class="mb-1 block text-sm font-medium text-slate-700">Site başlığı</label><input name="site_title" value="' + esc(s.site_title) + '" class="w-full rounded-md border border-slate-200 px-3 py-2 text-sm"></div>' +
+            '<div><label class="mb-1 block text-sm font-medium text-slate-700">Slogan</label><input name="site_tagline" value="' + esc(s.site_tagline) + '" class="w-full rounded-md border border-slate-200 px-3 py-2 text-sm"></div>' +
+            '<div><label class="mb-1 block text-sm font-medium text-slate-700">Site URL</label><input name="site_url" value="' + esc(s.site_url) + '" class="w-full rounded-md border border-slate-200 px-3 py-2 text-sm"><p class="mt-1 text-xs text-slate-400">“Siteyi görüntüle” bağlantısı bu adresi açar.</p></div>' +
+            '<div><label class="mb-1 block text-sm font-medium text-slate-700">Sayfa başına yazı</label><input name="posts_per_page" type="number" min="5" max="50" value="' + esc(s.posts_per_page) + '" class="w-32 rounded-md border border-slate-200 px-3 py-2 text-sm"></div>' +
+            '<button class="rounded-md bg-[#2271b1] px-4 py-2 text-sm font-semibold text-white hover:bg-blue-800">Değişiklikleri kaydet</button></form></div>';
+    }
+
+    function pageInner() {
+        switch (state.page) {
+            case 'posts': return renderPosts();
+            case 'post-new': return renderPostNew();
+            case 'categories': return renderCategories();
+            case 'pages': return renderPages();
+            case 'media': return renderMedia();
+            case 'comments': return renderComments();
+            case 'messages': return renderMessages();
+            case 'users': return renderUsers();
+            case 'settings': return renderSettings();
+            default: return renderDashboard();
+        }
+    }
+
+    function bindShell() {
+        var sidebar = document.getElementById('admin-sidebar');
+        var toggle = document.getElementById('sidebar-toggle');
+        var backdrop = document.getElementById('sidebar-backdrop');
+        function closeSidebar() {
+            if (!sidebar) return;
+            sidebar.classList.add('-translate-x-full');
+            if (backdrop) backdrop.classList.add('hidden');
+        }
+        function openSidebar() {
+            if (!sidebar) return;
+            sidebar.classList.remove('-translate-x-full');
+            if (backdrop) backdrop.classList.remove('hidden');
+        }
+        if (toggle) {
+            toggle.addEventListener('click', function () {
+                if (sidebar && sidebar.classList.contains('-translate-x-full')) openSidebar();
+                else closeSidebar();
+            });
+        }
+        if (backdrop) backdrop.addEventListener('click', closeSidebar);
+        document.querySelectorAll('[data-submenu-toggle]').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var id = btn.getAttribute('data-submenu-toggle');
+                var panel = id ? document.getElementById(id) : null;
+                if (!panel) return;
+                panel.classList.toggle('hidden');
+                btn.setAttribute('aria-expanded', panel.classList.contains('hidden') ? 'false' : 'true');
+                var chevron = btn.querySelector('[data-submenu-chevron]');
+                if (chevron) chevron.classList.toggle('rotate-180');
+            });
+        });
+        document.querySelectorAll('[data-dropdown]').forEach(function (wrap) {
+            var button = wrap.querySelector('[data-dropdown-button]');
+            var panel = wrap.querySelector('[data-dropdown-panel]');
+            if (!button || !panel) return;
+            button.addEventListener('click', function (ev) {
+                ev.stopPropagation();
+                document.querySelectorAll('[data-dropdown-panel]').forEach(function (other) {
+                    if (other !== panel) other.classList.add('hidden');
+                });
+                panel.classList.toggle('hidden');
+            });
+        });
+
+        var headerSearch = document.getElementById('header-search');
+        if (headerSearch) {
+            headerSearch.addEventListener('submit', function (ev) {
+                ev.preventDefault();
+                var q = headerSearch.querySelector('[name=q]').value;
+                go('#posts' + (q ? '?q=' + encodeURIComponent(q) : ''));
+            });
+        }
+        var postsSearch = document.getElementById('posts-search');
+        if (postsSearch) {
+            postsSearch.addEventListener('submit', function (ev) {
+                ev.preventDefault();
+                var q = postsSearch.querySelector('[name=q]').value;
+                var hash = '#posts';
+                var parts = [];
+                if (state.status) parts.push('status=' + encodeURIComponent(state.status));
+                if (q) parts.push('q=' + encodeURIComponent(q));
+                if (parts.length) hash += '?' + parts.join('&');
+                go(hash);
+            });
+        }
+        document.querySelectorAll('[data-delete-post]').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                if (!confirm('Bu yazı silinsin mi?')) return;
+                var id = parseInt(btn.getAttribute('data-delete-post'), 10);
+                SEED.posts = SEED.posts.filter(function (p) { return p.id !== id; });
+                setFlash('success', 'Yazı silindi.');
+                render();
+            });
+        });
+        document.querySelectorAll('[data-delete-cat]').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                if (!confirm('Kategori silinsin mi?')) return;
+                var id = parseInt(btn.getAttribute('data-delete-cat'), 10);
+                SEED.categories = SEED.categories.filter(function (c) { return c.id !== id; });
+                setFlash('success', 'Kategori silindi.');
+                render();
+            });
+        });
+        document.querySelectorAll('[data-delete-page]').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                if (!confirm('Sayfa silinsin mi?')) return;
+                var id = parseInt(btn.getAttribute('data-delete-page'), 10);
+                SEED.pages = SEED.pages.filter(function (p) { return p.id !== id; });
+                setFlash('success', 'Sayfa silindi.');
+                go('#pages');
+            });
+        });
+        document.querySelectorAll('[data-comment-action]').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var id = parseInt(btn.getAttribute('data-id'), 10);
+                var action = btn.getAttribute('data-comment-action');
+                if (action === 'delete') {
+                    if (!confirm('Yorum silinsin mi?')) return;
+                    SEED.comments = SEED.comments.filter(function (c) { return c.id !== id; });
+                    setFlash('success', 'Yorum silindi.');
+                } else {
+                    SEED.comments.forEach(function (c) {
+                        if (c.id === id) c.status = action === 'approve' ? 'approved' : action;
+                    });
+                    setFlash('success', action === 'approve' ? 'Yorum onaylandı.' : (action === 'spam' ? 'Yorum spam olarak işaretlendi.' : 'Yorum onaya alındı.'));
+                }
+                render();
+            });
+        });
+        document.querySelectorAll('[data-message-action]').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var id = parseInt(btn.getAttribute('data-id'), 10);
+                var action = btn.getAttribute('data-message-action');
+                if (action === 'delete') {
+                    if (!confirm('Mesaj silinsin mi?')) return;
+                    SEED.messages = SEED.messages.filter(function (m) { return m.id !== id; });
+                    setFlash('success', 'Mesaj silindi.');
+                } else {
+                    SEED.messages.forEach(function (m) {
+                        if (m.id === id) m.is_read = action === 'read' ? 1 : 0;
+                    });
+                    setFlash('success', action === 'read' ? 'Mesaj okundu olarak işaretlendi.' : 'Mesaj okunmadı olarak işaretlendi.');
+                }
+                render();
+            });
+        });
+        var postForm = document.getElementById('post-form');
+        if (postForm) {
+            postForm.addEventListener('submit', function (ev) {
+                ev.preventDefault();
+                setFlash('success', 'Önizlemede yazı kaydı simüle edildi. Canlı sitede PHP/MySQL gerekir.');
+                go('#posts');
+            });
+        }
+        var catForm = document.getElementById('cat-form');
+        if (catForm) {
+            catForm.addEventListener('submit', function (ev) {
+                ev.preventDefault();
+                var name = catForm.querySelector('[name=name]').value.trim();
+                if (!name) return;
+                var id = SEED.categories.reduce(function (m, c) { return Math.max(m, c.id); }, 0) + 1;
+                SEED.categories.push({ id: id, name: name, slug: name.toLowerCase().replace(/\s+/g, '-'), post_count: 0 });
+                setFlash('success', 'Kategori eklendi.');
+                render();
+            });
+        }
+        var pageForm = document.getElementById('page-form');
+        if (pageForm) {
+            pageForm.addEventListener('submit', function (ev) {
+                ev.preventDefault();
+                setFlash('success', 'Sayfa kaydedildi (önizleme).');
+                go('#pages');
+            });
+        }
+        var mediaForm = document.getElementById('media-form');
+        if (mediaForm) {
+            mediaForm.addEventListener('submit', function (ev) {
+                ev.preventDefault();
+                setFlash('error', 'GitHub Pages önizlemesinde dosya yüklenmez.');
+                render();
+            });
+        }
+        var userForm = document.getElementById('user-form');
+        if (userForm) {
+            userForm.addEventListener('submit', function (ev) {
+                ev.preventDefault();
+                var roleMap = { author: 'Yazar', editor: 'Editör', admin: 'Yönetici' };
+                SEED.users.push({
+                    id: SEED.users.length + 1,
+                    display_name: userForm.querySelector('[name=display_name]').value,
+                    username: userForm.querySelector('[name=username]').value,
+                    email: userForm.querySelector('[name=email]').value,
+                    role: roleMap[userForm.querySelector('[name=role]').value] || 'Yazar',
+                    created_at: '09.09.2026 20:00'
+                });
+                setFlash('success', 'Kullanıcı eklendi.');
+                render();
+            });
+        }
+        var settingsForm = document.getElementById('settings-form');
+        if (settingsForm) {
+            settingsForm.addEventListener('submit', function (ev) {
+                ev.preventDefault();
+                SEED.settings.site_title = settingsForm.querySelector('[name=site_title]').value;
+                SEED.settings.site_tagline = settingsForm.querySelector('[name=site_tagline]').value;
+                SEED.settings.site_url = settingsForm.querySelector('[name=site_url]').value;
+                SEED.settings.posts_per_page = settingsForm.querySelector('[name=posts_per_page]').value;
+                setFlash('success', 'Ayarlar kaydedildi.');
+                render();
+            });
+        }
+    }
+
+    function render() {
+        parseHash();
+        var app = document.getElementById('app');
+        if (!state.loggedIn || state.page === 'login') {
+            app.innerHTML = renderLogin();
+            var form = document.getElementById('login-form');
+            if (form) {
+                form.addEventListener('submit', function (ev) {
+                    ev.preventDefault();
+                    var user = form.username.value.trim();
+                    var pass = form.password.value;
+                    if (user === 'admin' && pass === 'Admin123!') {
+                        sessionStorage.setItem('cms_preview_auth', '1');
+                        state.loggedIn = true;
+                        state.loginError = '';
+                        go('#dashboard');
+                    } else {
+                        state.loginError = 'Kullanıcı adı veya şifre hatalı.';
+                        render();
+                    }
+                });
+            }
+            return;
+        }
+        app.innerHTML = renderShell(pageInner());
+        bindShell();
+        state.flash = null;
+    }
+
+    document.addEventListener('click', function () {
+        document.querySelectorAll('[data-dropdown-panel]').forEach(function (panel) {
+            panel.classList.add('hidden');
+        });
+    });
+
+    window.addEventListener('hashchange', render);
+    if (!location.hash) location.hash = state.loggedIn ? '#dashboard' : '#login';
+    render();
+})();
+</script>
+</body>
+</html>
