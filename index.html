@@ -11,8 +11,24 @@
     <script>
         tailwind.config = { theme: { extend: { colors: { ink: '#071018' } } } }
     </script>
+    <style>
+        .skip-link {
+            position: absolute;
+            left: 1rem;
+            top: -4rem;
+            z-index: 80;
+            background: #22d3ee;
+            color: #071018;
+            padding: 0.55rem 1rem;
+            border-radius: 0.55rem;
+            font-weight: 700;
+            font-size: 0.875rem;
+        }
+        .skip-link:focus { top: 1rem; outline: 2px solid #fff; outline-offset: 2px; }
+    </style>
 </head>
 <body class="bg-slate-50 text-slate-800 antialiased">
+<a class="skip-link" href="#icerik">İçeriğe atla</a>
 <header class="bg-ink text-white">
     <div class="max-w-6xl mx-auto px-4">
         <div class="h-16 flex items-center justify-between gap-4">
@@ -27,7 +43,7 @@
         </div>
     </div>
 </header>
-<main class="max-w-6xl mx-auto px-4 py-10">
+<main id="icerik" class="max-w-6xl mx-auto px-4 py-10" tabindex="-1">
     <section class="mb-8">
         <p class="text-sm uppercase tracking-wide text-cyan-700 font-semibold">Geliştirici günlüğü</p>
         <h1 class="mt-2 text-4xl font-bold text-slate-900">Kodcu</h1>
@@ -36,6 +52,7 @@
     <div class="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900 mb-8">
         Bu GitHub Pages kopyası yalnızca önizlemedir. PHP ve MySQL çalışmaz; canlı site için PHP hosting gerekir
         (<a class="underline" href="https://kodcu.site/" target="_blank" rel="noopener">kodcu.site</a>).
+        Sol alttaki erişilebilirlik menüsünden yazı boyutu ve kontrastı deneyebilirsiniz.
     </div>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <article class="bg-white border border-slate-200 rounded-xl p-5">
@@ -61,5 +78,7 @@
         <a class="hover:text-slate-800" href="https://github.com/Remedolt/webpanel">Kaynak kod</a>
     </div>
 </footer>
+<div id="a11y-root" data-a11y-position="left"></div>
+<script src="site/a11y-widget.js" defer></script>
 </body>
 </html>

@@ -79,9 +79,29 @@ $flashPublic = function_exists('flash_get') ? flash_get('flash_public') : null;
             color: #475569;
             margin: 0 0 1.1rem;
         }
+        .skip-link {
+            position: absolute;
+            left: 1rem;
+            top: -4rem;
+            z-index: 80;
+            background: #22d3ee;
+            color: #071018;
+            padding: 0.55rem 1rem;
+            border-radius: 0.55rem;
+            font-weight: 700;
+            font-size: 0.875rem;
+        }
+        .skip-link:focus {
+            top: 1rem;
+            outline: 2px solid #fff;
+            outline-offset: 2px;
+        }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 antialiased">
+<?php if (!empty($a11ySkip)): ?>
+    <a class="skip-link" href="#icerik">İçeriğe atla</a>
+<?php endif; ?>
 <header class="bg-ink text-white">
     <div class="max-w-6xl mx-auto px-4">
         <div class="h-16 flex items-center justify-between gap-4">
@@ -115,7 +135,7 @@ $flashPublic = function_exists('flash_get') ? flash_get('flash_public') : null;
         <?php endif; ?>
     </div>
 </header>
-<main class="max-w-6xl mx-auto px-4 py-10">
+<main id="icerik" class="max-w-6xl mx-auto px-4 py-10" tabindex="-1">
     <?php if (!empty($flashPublic) && is_array($flashPublic)): ?>
         <div class="mb-6 rounded-lg border px-4 py-3 text-sm <?= (($flashPublic['type'] ?? '') === 'error') ? 'border-red-200 bg-red-50 text-red-700' : 'border-emerald-200 bg-emerald-50 text-emerald-800' ?>">
             <?= e((string) ($flashPublic['message'] ?? '')) ?>
