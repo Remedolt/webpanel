@@ -1,0 +1,45 @@
+ErrorDocument 404 /404.php
+
+DirectoryIndex index.php
+Options -Indexes
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    RewriteRule ^fiyatlar/?$ /hizmetler [R=301,L]
+
+    # Eski PHP linklerini temiz adrese çevir
+    RewriteCond %{QUERY_STRING} ^slug=([A-Za-z0-9\-]+)$
+    RewriteRule ^yazi\.php$ /yazi/%1 [R=301,L]
+    RewriteCond %{QUERY_STRING} ^slug=([A-Za-z0-9\-]+)$
+    RewriteRule ^sayfa\.php$ /%1 [R=301,L]
+
+    # Gerçek dosya ve klasörleri elleme
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+
+    # Yazı: /yazi/slug
+    RewriteRule ^yazi/([A-Za-z0-9\-]+)/?$ yazi.php?slug=$1 [L,QSA]
+
+    # Galeri
+    RewriteRule ^galeri/?$ galeri.php [L,QSA]
+    RewriteRule ^galeri/([A-Za-z0-9\-]+)/?$ galeri.php?slug=$1 [L,QSA]
+
+    # İletişim
+    RewriteRule ^iletisim/?$ iletisim.php [L,QSA]
+    RewriteRule ^sss/?$ sss.php [L,QSA]
+    RewriteRule ^ara/?$ ara.php [L,QSA]
+    RewriteRule ^ekip/?$ ekip.php [L,QSA]
+    RewriteRule ^referanslar/?$ referanslar.php [L,QSA]
+    RewriteRule ^yazilar/?$ yazilar.php [L,QSA]
+    RewriteRule ^hizmetler/?$ hizmetler.php [L,QSA]
+    RewriteRule ^hizmet/([A-Za-z0-9\-]+)/?$ hizmet.php?slug=$1 [L,QSA]
+    RewriteRule ^kategori/([A-Za-z0-9\-]+)/?$ kategori.php?slug=$1 [L,QSA]
+    RewriteRule ^sitemap\.xml$ sitemap.php [L]
+    RewriteRule ^robots\.txt$ robots.php [L]
+    RewriteRule ^rss\.xml$ rss.php [L]
+
+    # Sayfa: /hakkinda
+    RewriteRule ^([A-Za-z0-9\-]+)/?$ sayfa.php?slug=$1 [L,QSA]
+</IfModule>

@@ -1,0 +1,25 @@
+# Hosting secrets — never commit live DB credentials
+**/includes/config.php
+panel/includes/config.php
+webpanel/includes/config.php
+
+# Uploads and local media
+panel/uploads/*
+!panel/uploads/.htaccess
+!panel/uploads/index.html
+webpanel/uploads/*
+!webpanel/uploads/.htaccess
+
+# Build / delivery artifacts
+cms-admin.zip
+*.zip
+
+# OS / editor
+.DS_Store
+Thumbs.db
+Desktop.ini
+.idea/
+.vscode/
+*.log
+.env
+.env.*
