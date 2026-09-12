@@ -215,6 +215,15 @@ function option_set(PDO $pdo, string $key, string $value): void
     $stmt->execute([$key, $value]);
 }
 
+function cms_ensure_option(PDO $pdo, string $key, string $value): void
+{
+    $stmt = $pdo->prepare(
+        'INSERT INTO options (option_key, option_value) VALUES (?, ?)
+         ON DUPLICATE KEY UPDATE option_key = option_key'
+    );
+    $stmt->execute([$key, $value]);
+}
+
 function format_datetime(?string $value): string
 {
     if ($value === null || $value === '') {
@@ -368,6 +377,14 @@ function cms_ensure_schema(PDO $pdo): void
     } catch (Throwable $e) {
         // ignore
     }
+
+    try {
+        cms_ensure_option($pdo, 'a11y_widget', '1');
+        cms_ensure_option($pdo, 'a11y_position', 'left');
+        cms_ensure_option($pdo, 'a11y_skip_link', '1');
+    } catch (Throwable $e) {
+        // options tablosu henüz yoksa sessizce geç
+    }
 }
 
 function media_src($path)
@@ -517,14 +534,18 @@ function cms_seed(PDO $pdo): void
         $stmt->execute(['Gizlilik', 'gizlilik', '<p>Taslak gizlilik metni.</p>', 'draft']);
     }
 
-    $optCount = (int) $pdo->query('SELECT COUNT(*) FROM options')->fetchColumn();
-    if ($optCount === 0) {
+    $titleExists = $pdo->prepare('SELECT 1 FROM options WHERE option_key = ? LIMIT 1');
+    $titleExists->execute(['site_title']);
+    if (!$titleExists->fetch()) {
         $stmt = $pdo->prepare('INSERT INTO options (option_key, option_value) VALUES (?, ?)');
         $stmt->execute(['site_title', 'Kodcu']);
         $stmt->execute(['site_tagline', 'Yazılar, sayfalar ve projeler']);
         $stmt->execute(['posts_per_page', '10']);
         $stmt->execute(['site_url', PUBLIC_URL]);
     }
+    cms_ensure_option($pdo, 'a11y_widget', '1');
+    cms_ensure_option($pdo, 'a11y_position', 'left');
+    cms_ensure_option($pdo, 'a11y_skip_link', '1');
 }
 
 function handle_image_upload(string $field = 'featured_image'): ?string

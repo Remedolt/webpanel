@@ -60,6 +60,9 @@ if (!function_exists('public_html')) {
 
 $siteTitle = option_get($pdo, 'site_title', 'Kodcu');
 $siteTagline = option_get($pdo, 'site_tagline', '');
+$a11yWidget = option_get($pdo, 'a11y_widget', '1') === '1';
+$a11yPosition = option_get($pdo, 'a11y_position', 'left') === 'right' ? 'right' : 'left';
+$a11ySkip = option_get($pdo, 'a11y_skip_link', '1') === '1';
 $navPages = $pdo->query("SELECT title, slug FROM site_pages WHERE status = 'publish' ORDER BY title ASC")->fetchAll();
 $navCategories = $pdo->query(
     "SELECT c.name, c.slug, COUNT(p.id) AS post_count

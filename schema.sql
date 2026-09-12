@@ -99,6 +99,9 @@ CREATE TABLE IF NOT EXISTS options (
     PRIMARY KEY (option_key)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Erişilebilirlik anahtarları (a11y_widget, a11y_position, a11y_skip_link)
+-- PHP cms_ensure_schema / cms_seed ile yazılır; mevcut değerler üzerine yazılmaz.
+
 SET FOREIGN_KEY_CHECKS = 1;
 
 -- Kullanıcı kaydı ilk panel açılışında PHP tarafında oluşturulur

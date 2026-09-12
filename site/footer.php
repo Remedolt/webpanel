@@ -42,5 +42,6 @@ $navCategories = isset($navCategories) && is_array($navCategories) ? $navCategor
         </div>
     </div>
 </footer>
+<?php require __DIR__ . '/a11y-widget.php'; ?>
 </body>
 </html>
